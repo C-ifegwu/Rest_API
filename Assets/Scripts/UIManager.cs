@@ -1,5 +1,6 @@
 using UnityEngine;
-using TMPro; // Crucial! This allows us to control TextMeshPro components via code.
+using TMPro;
+using System.Linq; // EXTRA CREDIT: Required for LINQ sorting functionality
 
 public class UIManager : MonoBehaviour
 {
@@ -10,11 +11,24 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI metadataText;
 
     [Header("Inventory Settings")]
-    [SerializeField] private Transform inventoryContainer; // The InventoryContainer panel
-    [SerializeField] private GameObject inventoryItemPrefab; // The prefab from Phase 3
+    [SerializeField] private Transform inventoryContainer;
+    [SerializeField] private GameObject inventoryItemPrefab;
+
+    // EXTRA CREDIT: Subscribe to the event when this script turns on
+    private void OnEnable()
+    {
+        NetworkManager.OnDataFetched += PopulateUI;
+    }
+
+    // EXTRA CREDIT: Unsubscribe when it turns off to prevent memory leaks
+    private void OnDisable()
+    {
+        NetworkManager.OnDataFetched -= PopulateUI;
+    }
 
     /// <summary>
     /// Takes the fully deserialized data class and maps it directly to the UI elements.
+    /// This is triggered automatically by the OnDataFetched event.
     /// </summary>
     public void PopulateUI(RootResponse data)
     {
@@ -33,14 +47,17 @@ public class UIManager : MonoBehaviour
         positionText.text = $"Position: X: {data.record.position.x}, Y: {data.record.position.y}, Z: {data.record.position.z}";
 
         // 3. Clear any existing inventory items inside the container 
-        // (This prevents items from stacking up if you download data multiple times!)
+        // (This prevents items from stacking up if you click the refresh button!)
         foreach (Transform child in inventoryContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // 4. Loop through the inventory list and spawn a prefab for each item
-        foreach (InventoryItem item in data.record.inventory)
+        // 4. EXTRA CREDIT: Use LINQ to sort the inventory array by weight (lightest to heaviest)
+        var sortedInventory = data.record.inventory.OrderBy(item => item.weight).ToList();
+
+        // 5. Loop through the *sorted* inventory list and spawn a prefab for each item
+        foreach (InventoryItem item in sortedInventory)
         {
             // Instantiate creates a clone of our prefab inside the container layout group
             GameObject spawnedItem = Instantiate(inventoryItemPrefab, inventoryContainer);
@@ -58,7 +75,7 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // 5. Populate the metadata tracking info at the bottom
+        // 6. Populate the metadata tracking info at the bottom
         metadataText.text = $"Data ID: {data.metadata.id}\nCreated: {data.metadata.createdAt}";
     }
 }

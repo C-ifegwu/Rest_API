@@ -1,15 +1,25 @@
+using System; // Required for Actions/Events
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking; // Required to use UnityWebRequest
 
 public class NetworkManager : MonoBehaviour
 {
-    [SerializeField] private UIManager uiManager;
-    // The URL provided in our assignment
+    // The URL provided in your assignment
     private readonly string apiUrl = "https://api.jsonbin.io/v3/b/6686a992e41b4d34e40d06fa";
+
+    // EXTRA CREDIT: Create an Event (Delegate) that broadcasts the data globally
+    // Any script can listen to this event without needing a direct reference to the NetworkManager.
+    public static event Action<RootResponse> OnDataFetched;
 
     // This runs the very moment the game starts
     void Start()
+    {
+        FetchData();
+    }
+
+    // EXTRA CREDIT: A public method the Refresh Button can call
+    public void FetchData()
     {
         // We start the Coroutine to fetch data in the background
         StartCoroutine(GetJsonData());
@@ -36,18 +46,14 @@ public class NetworkManager : MonoBehaviour
                 string jsonResponse = webRequest.downloadHandler.text;
                 Debug.Log("Successfully downloaded JSON! Raw text: " + jsonResponse);
 
-                // 5. Deserialize! This is where the magic happens. 
-                // We tell Unity's JsonUtility to map the raw text to our RootResponse class.
+                // 5. Deserialize! We tell Unity's JsonUtility to map the raw text to our RootResponse class.
                 RootResponse parsedData = JsonUtility.FromJson<RootResponse>(jsonResponse);
 
-                // 6. Test that it worked by printing a specific piece of data to the console
-                if (uimanager != null)
+                if (parsedData != null && parsedData.record != null)
                 {
-                    uiManager.PopulateUI(parsedData);
-                }
-                else
-                {
-                    Debug.LogError("UIManager reference is missing! Cannot populate UI.");
+                    // 6. EXTRA CREDIT: Broadcast the data to ANY script listening
+                    // The '?' safely checks if anything is actually listening before broadcasting
+                    OnDataFetched?.Invoke(parsedData);
                 }
             }
         }
