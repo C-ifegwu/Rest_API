@@ -4,7 +4,8 @@ using UnityEngine.Networking; // Required to use UnityWebRequest
 
 public class NetworkManager : MonoBehaviour
 {
-    // The URL provided in your assignment
+    [SerializeField] private UIManager uiManager;
+    // The URL provided in our assignment
     private readonly string apiUrl = "https://api.jsonbin.io/v3/b/6686a992e41b4d34e40d06fa";
 
     // This runs the very moment the game starts
@@ -40,10 +41,13 @@ public class NetworkManager : MonoBehaviour
                 RootResponse parsedData = JsonUtility.FromJson<RootResponse>(jsonResponse);
 
                 // 6. Test that it worked by printing a specific piece of data to the console
-                if (parsedData != null && parsedData.record != null)
+                if (uimanager != null)
                 {
-                    Debug.Log("Success! The Player's Name is: " + parsedData.record.playerName);
-                    Debug.Log("Success! The Player's Health is: " + parsedData.record.health);
+                    uiManager.PopulateUI(parsedData);
+                }
+                else
+                {
+                    Debug.LogError("UIManager reference is missing! Cannot populate UI.");
                 }
             }
         }
