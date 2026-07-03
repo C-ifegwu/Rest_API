@@ -5,10 +5,10 @@ using UnityEngine.Networking; // Required to use UnityWebRequest
 
 public class NetworkManager : MonoBehaviour
 {
-    // The URL provided in your assignment
+    // The URL provided in our assignment
     private readonly string apiUrl = "https://api.jsonbin.io/v3/b/6686a992e41b4d34e40d06fa";
 
-    // EXTRA CREDIT: Create an Event (Delegate) that broadcasts the data globally
+    // Created a public static event that other scripts can subscribe to
     // Any script can listen to this event without needing a direct reference to the NetworkManager.
     public static event Action<RootResponse> OnDataFetched;
 
@@ -18,10 +18,10 @@ public class NetworkManager : MonoBehaviour
         FetchData();
     }
 
-    // EXTRA CREDIT: A public method the Refresh Button can call
+    // A public method the Refresh Button can call
     public void FetchData()
     {
-        // We start the Coroutine to fetch data in the background
+        // I start the Coroutine to fetch data in the background
         StartCoroutine(GetJsonData());
     }
 
@@ -51,7 +51,7 @@ public class NetworkManager : MonoBehaviour
 
                 if (parsedData != null && parsedData.record != null)
                 {
-                    // 6. EXTRA CREDIT: Broadcast the data to ANY script listening
+                    // 6.  Broadcast the data to ANY script listening
                     // The '?' safely checks if anything is actually listening before broadcasting
                     OnDataFetched?.Invoke(parsedData);
                 }

@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
         NetworkManager.OnDataFetched += PopulateUI;
     }
 
-    // EXTRA CREDIT: Unsubscribe when it turns off to prevent memory leaks
+    // Unsubscribe when it turns off to prevent memory leaks
     private void OnDisable()
     {
         NetworkManager.OnDataFetched -= PopulateUI;
@@ -53,7 +53,7 @@ public class UIManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // 4. EXTRA CREDIT: Use LINQ to sort the inventory array by weight (lightest to heaviest)
+        // 4.  Use LINQ to sort the inventory array by weight (lightest to heaviest)
         var sortedInventory = data.record.inventory.OrderBy(item => item.weight).ToList();
 
         // 5. Loop through the *sorted* inventory list and spawn a prefab for each item

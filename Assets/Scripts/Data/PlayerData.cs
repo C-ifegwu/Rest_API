@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-// We use [Serializable] so Unity's JsonUtility can read and write to these classes.
+// I use [Serializable] so Unity's JsonUtility can read and write to these classes.
 
 [Serializable]
 public class InventoryItem
@@ -47,7 +47,7 @@ public class Metadata
 [Serializable]
 public class RootResponse
 {
-    // This is the absolute top level. When we download the JSON, we will tell Unity to convert it into this specific class.
+    // When we download the JSON, we will tell Unity to convert it into this specific class.
     public Record record;
     public Metadata metadata;
 }
